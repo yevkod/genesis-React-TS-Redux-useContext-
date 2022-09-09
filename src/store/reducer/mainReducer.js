@@ -4,28 +4,23 @@ export const initEvents = () => {
     return parsedEvents;
 }
 
-//savedEventsReducer
-
-const PUSH = "PUSH";
-const UPDATE = "UPDATE";
-const DELETE = "DELETE";
 
 const initialState = initEvents() || [];
 
-const reducer = (state = initialState, action) => {
+const mainReducer = (state = initialState, action) => {
     switch (action.type) {
-        case PUSH:
+        case "push":
             return [...state, action.payload];
-        case UPDATE:
+        case "update":
             return state.map((evt) =>
                 evt.id === action.payload.id ? action.payload : evt
             );
-        case DELETE:
+        case "delete":
             return state.filter((evt) => evt.id !== action.payload.id);
         default:
-            throw new Error();
+            return state;
     }
 }
 
-export default reducer;
+export default mainReducer;
 

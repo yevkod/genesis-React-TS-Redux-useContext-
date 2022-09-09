@@ -1,47 +1,17 @@
-import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
-
-import {
-    CalenderHeaderContainer,
-    DropdownContainer,
-    AppointmentButton
-} from '../styledComponent/index';
-
-import { yearOptions, monthOptions } from '../constant/index';
+import React, {useContext} from "react";
+import plusImg from "../assets/plus.svg";
+import GlobalContext from "../context/GlobalContext";
 
 
-function CalenderHeader( props ) {
-
-
-    const onYearSelect = ( date ) => {
-        props.onYearSelect( date )
-    }
-
-    const onMonthSelect = ( date ) => {
-        props.onMonthSelect( date )
-    }
-
-    const openModal = () => {
-        props.openModal()
-    }
-
+export default function CreateEventButton() {
+    const { setShowEventModal } = useContext(GlobalContext);
     return (
-        <CalenderHeaderContainer>
-            <DropdownContainer>
-                <Dropdown
-                    options={yearOptions}
-                    onChange={onYearSelect}
-                    value={props.defaultYear}
-                />
-                <Dropdown
-                    options={monthOptions}
-                    onChange={onMonthSelect}
-                    value={props.defaultMonth}
-                />
-            </DropdownContainer>
-            <AppointmentButton onClick={openModal}>Create Appointment</AppointmentButton>
-        </CalenderHeaderContainer>
+        <button
+            onClick={() => setShowEventModal(true)}
+            className="border p-2 rounded-full flex items-center shadow-md hover:shadow-2xl"
+        >
+            <img src={plusImg} alt="create_event" className="w-7 h-7" />
+            <span className="pl-3 pr-7"> Create</span>
+        </button>
     );
 }
-
-export default CalenderHeader;

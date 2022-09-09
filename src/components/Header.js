@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import GlobalContext from "../context/GlobalContext";
 
 
-export default function CalendarHeader() {
+export default function Header() {
     const { monthIndex, setMonthIndex } = useContext(GlobalContext);
     function handlePrevMonth() {
         setMonthIndex(monthIndex - 1);

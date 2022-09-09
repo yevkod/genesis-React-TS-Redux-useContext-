@@ -1,21 +1,99 @@
-import _ from 'lodash';
+import React, {
+    useState,
+    useEffect,
+    useReducer,
+    useMemo,
+} from "react";
+import dayjs from "dayjs";
+import GlobalContext from "./GlobalContext";
+import mainReducer, {initEvents} from "../store/reducer/mainReducer";
 
-export const weekArray = [
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat'
-];
 
-export const gridArray = _.range(0, 42);
 
-export const yearOptions = [
-    '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030'
-];
+export const AppContextProvider = (props) => {
+    const [monthIndex, setMonthIndex] = useState(dayjs().month());
+    const [smallCalendarMonth, setSmallCalendarMonth] = useState(null);
+    const [daySelected, setDaySelected] = useState(dayjs());
+    const [showEventModal, setShowEventModal] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [labels, setLabels] = useState([]);
+    const [savedEvents, dispatchCalEvent] = useReducer(
+        mainReducer,
+        [],
+        initEvents
+    );
 
-export const monthOptions = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-]
+
+    const filteredEvents = useMemo(() => {
+        return savedEvents.filter((evt) =>
+            labels
+                .filter((lbl) => lbl.checked)
+                .map((lbl) => lbl.label)
+                .includes(evt.label)
+        );
+    }, [savedEvents, labels]);
+
+
+    useEffect(() => {
+        localStorage.setItem("savedEvents", JSON.stringify(savedEvents));
+    }, [savedEvents]);
+
+    useEffect(() => {
+        setLabels((prevLabels) => {
+            return [...new Set(savedEvents.map((evt) => evt.label))].map(
+                (label) => {
+                    const currentLabel = prevLabels.find(
+                        (lbl) => lbl.label === label
+                    );
+                    return {
+                        label,
+                        checked: currentLabel ? currentLabel.checked : true,
+                    };
+                }
+            );
+        });
+    }, [savedEvents]);
+
+    useEffect(() => {
+        if (smallCalendarMonth !== null) {
+            setMonthIndex(smallCalendarMonth);
+        }
+    }, [smallCalendarMonth]);
+
+    useEffect(() => {
+        if (!showEventModal) {
+            setSelectedEvent(null);
+        }
+    }, [showEventModal]);
+
+    function updateLabel(label) {
+        setLabels(
+            labels.map((lbl) => (lbl.label === label.label ? label : lbl))
+        );
+    }
+
+    return (
+        <GlobalContext.Provider
+            value={{
+                monthIndex,
+                setMonthIndex,
+                smallCalendarMonth,
+                setSmallCalendarMonth,
+                daySelected,
+                setDaySelected,
+                showEventModal,
+                setShowEventModal,
+                dispatchCalEvent,
+                selectedEvent,
+                setSelectedEvent,
+                savedEvents,
+                setLabels,
+                labels,
+                updateLabel,
+                filteredEvents,
+            }}
+        >
+            {props.children}
+        </GlobalContext.Provider>
+    );
+}
